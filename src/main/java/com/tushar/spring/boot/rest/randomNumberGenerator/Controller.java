@@ -2,15 +2,14 @@ package com.tushar.spring.boot.rest.randomNumberGenerator;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,8 +20,6 @@ public class Controller {
 
 	private final AtomicLong counter = new AtomicLong();
 
-	@Autowired
-	private BasicDataSource basicDataSource;
 
 	@RequestMapping("/generate/randomnumber")
 	public RandonNumber greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
@@ -30,9 +27,8 @@ public class Controller {
 	}
 
 	@RequestMapping("/student")
-	public Student getStudent(@RequestParam(value = "id", defaultValue = "NaN") String id) throws SQLException {
-		System.out.println(basicDataSource.getDefaultAutoCommit());
-		Statement stmt = basicDataSource.getConnection().createStatement();
+	public Student getStudent(@RequestParam(value = "id", defaultValue = "NaN") String id) throws SQLException, URISyntaxException {
+		Statement stmt = dataSource().createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT \"ID\", \"NAME\" FROM \"Student\"");
 		Student student = new Student();
 		while (rs.next()) {
@@ -42,23 +38,20 @@ public class Controller {
 		}
 		return student;
 	}
+	// You can see the DATABASE_URL provided to an application by running:
 
+	// heroku config
 	@Bean
-	public BasicDataSource dataSource() throws URISyntaxException {
+	public Connection dataSource() throws URISyntaxException, SQLException {
 
-		 URI dbUri = new URI(System.getenv("DATABASE_URL"));
-		//URI dbUri = new URI("postgres://postgres:06109@localhost:5432/databasename");
+		URI dbUri = new URI(System.getenv("DATABASE_URL"));
+		 //URI dbUri = new URI("postgres://postgres:06109@localhost:5432/databasename");
 
 		String username = dbUri.getUserInfo().split(":")[0];
 		String password = dbUri.getUserInfo().split(":")[1];
-		String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + dbUri.getPath() + ":" + dbUri.getPort()
-				+ dbUri.getPath();
+		String dbUrl = "jdbc:postgresql://" + dbUri.getHost() +  ":" + dbUri.getPort() + dbUri.getPath();
 
-		BasicDataSource basicDataSource = new BasicDataSource();
-		basicDataSource.setUrl(dbUrl);
-		basicDataSource.setUsername(username);
-		basicDataSource.setPassword(password);
+		return DriverManager.getConnection(dbUrl, username, password);
 
-		return basicDataSource;
 	}
 }

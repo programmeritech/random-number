@@ -18,19 +18,13 @@
 	</parent>
 
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/commons-dbcp/commons-dbcp -->
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.2.2</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
-		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901-1.jdbc4</version>
+			<version>9.4-1206-jdbc42</version>
 		</dependency>
 
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
